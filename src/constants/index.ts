@@ -67,11 +67,11 @@ export const returnResponseQuery = <T>(
 
 export const validateBody =
   (schema: ZodSchema) =>
-  (req: Request, res: Response, next: NextFunction) => {
+  (req: any, res: Response, next: NextFunction) => {
     try {
-      const user = req.body.user;
+      const user = req.user;
       req.body = schema.parse(req.body);
-      req.body.user = user;
+      req.user = user;
       next();
     } catch (error) {
       if (error instanceof ZodError) {

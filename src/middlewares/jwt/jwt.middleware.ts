@@ -26,7 +26,7 @@ const getTokenFromHeader = (req: Request): string | null => {
 };
 
 const isUser = async (
-  req: Request,
+  req: any,
   res: Response,
   next: NextFunction,
 ): Promise<Response | void> => {
@@ -45,7 +45,7 @@ const isUser = async (
         return returnResponse("User not found", null, res, 404);
       }
       //
-      req.body.user = { ...decoded.data, userId: decoded.data.account_id };
+      req.user = { ...decoded.data, userId: decoded.data.account_id };
       return next();
     }
 
@@ -56,7 +56,7 @@ const isUser = async (
 };
 
 const isAdmin = (
-  req: Request,
+  req: any,
   res: Response,
   next: NextFunction,
 ): Response | void => {
@@ -68,7 +68,7 @@ const isAdmin = (
     const decoded = jwt.verify(token, ENV.SECRET) as DecodedToken;
     if (decoded.data.role === ROLE.ADMIN) {
       //
-      req.body.user = { ...decoded.data, userId: decoded.data.account_id };
+      req.user = { ...decoded.data, userId: decoded.data.account_id };
       return next();
     }
     return returnResponse("Forbidden", null, res, 403);
@@ -77,7 +77,7 @@ const isAdmin = (
   }
 };
 
-const isLogin = async (req: Request, res: Response, next: NextFunction) => {
+const isLogin = async (req: any, res: Response, next: NextFunction) => {
   const token = getTokenFromHeader(req);
   if (!token) {
     return returnResponse("Access token is missing", null, res, 401);
@@ -89,9 +89,9 @@ const isLogin = async (req: Request, res: Response, next: NextFunction) => {
       decoded.data.role === ROLE.USER ||
       decoded.data.role === ROLE.SHOP
     ) {
-      console.log({ ...decoded.data, userId: decoded.data.account_id })
       const user = { ...decoded.data, userId: decoded.data.account_id }
-      req.body.user = user;
+      req.body = req.body || {};
+      req.user = user;
       return next();
     }
     return returnResponse("Forbidden", null, res, 403);

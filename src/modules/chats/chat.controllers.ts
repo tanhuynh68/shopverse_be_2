@@ -7,10 +7,10 @@ import { returnResponse } from "../../constants/index.js";
 import { MESSAGES } from "../../messages/index.js";
 import { getUserByIdService } from "../users/users.service.js";
 
-export const createRoom = async (req: Request, res: Response) => {
+export const createRoom = async (req: any, res: Response) => {
   try {
     // get id from user logged in;
-    const {userId} = req.body.user;
+    const {userId} = req.user;
     const { secondUser } = req.body;
     // get user
     const isUser = await getUserByIdService(secondUser);
@@ -26,9 +26,9 @@ export const createRoom = async (req: Request, res: Response) => {
   }
 };
 
-export const userGetRooms = async (req: Request, res: Response) => {
+export const userGetRooms = async (req: any, res: Response) => {
   try {
-    const { userId, role } = req.body.user;
+    const { userId, role } = req.user;
     console.log({ userId, role })
     //
     const rooms = await customerGetRoomsService(userId, role);

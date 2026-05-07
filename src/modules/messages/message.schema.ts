@@ -1,62 +1,84 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const { Schema } = mongoose;
+export enum MESSAGE_TYPE {
+  TEXT = "TEXT",
+  IMAGE = "IMAGE",
+  VIDEO = "VIDEO",
+  PRODUCT = "PRODUCT",
+  ORDER = "ORDER",
+}
 
 const messageSchema = new Schema(
   {
+    // id
     roomId: {
       type: Schema.Types.ObjectId,
       ref: "chat_rooms",
       required: true,
     },
 
-    senderId: {
+    sender: {
       type: Schema.Types.ObjectId,
       ref: "user",
       required: true,
     },
 
-    text: {
+    type: {
       type: String,
-      default: "",
+      enum: Object.values(MESSAGE_TYPE),
+      default: MESSAGE_TYPE.TEXT,
+    },
+
+    // text message
+    message: {
+      type: String,
       trim: true,
+      default: "",
     },
-    productId: {
-      type: Schema.Types.ObjectId,
-      ref: "products",
+
+    // image/video
+    mediaUrl: {
+      type: String,
       default: null,
     },
 
-    orderId: {
+    // product id
+    product: {
       type: Schema.Types.ObjectId,
-      ref: "orders",
+      ref: "Product",
       default: null,
     },
 
-    images: [
-      {
-        type: String,
-      },
-    ],
+    // order id
+    order: {
+      type: Schema.Types.ObjectId,
+      ref: "Order",
+      default: null,
+    },
 
-    seenBy: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "user",
-      },
-    ],
-
-    isDeleted: {
+    isSeen: {
       type: Boolean,
       default: false,
     },
+
+    seenAt: {
+      type: Date,
+      default: null,
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-// query tin nhắn theo room nhanh hơn
-messageSchema.index({ roomId: 1, createdAt: -1 });
+messageSchema.index({
+  room: 1,
+  createdAt: -1,
+});
 
-const Message = mongoose.model("messages", messageSchema);
+const Message = mongoose.model(
+  "message",
+  messageSchema
+);
 
 export default Message;
