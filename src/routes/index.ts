@@ -1,6 +1,6 @@
 
 import express from 'express'
-import roomRoute from '../modules/chat/chat.routes.js';
+import roomRoute from '../modules/chats/chat.routes.js';
 
 const router =express.Router();
 

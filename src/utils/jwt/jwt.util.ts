@@ -1,0 +1,107 @@
+import ENV from "../../config/env.config.js";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { Request, Response, NextFunction } from "express";
+import { returnResponse } from "../../constants/index.js";
+import { ROLE } from "../../constants/role.constant.js";
+import User from "../../modules/users/users.schema.js";
+
+interface DecodedToken extends JwtPayload {
+  data: {
+    email: string;
+    role: string;
+    name: string;
+    account_id: string;
+    isPasswordExisted: boolean;
+  };
+}
+
+const getTokenFromHeader = (req: Request): string | null => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return null;
+  }
+
+  return authHeader.split(" ")[1];
+};
+
+const isUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> => {
+  const token = getTokenFromHeader(req);
+
+  if (!token) {
+    return returnResponse("Access token is missing", null, res, 401);
+  }
+
+  try {
+    const decoded = jwt.verify(token, ENV.SECRET) as DecodedToken;
+    if (decoded.data.role === ROLE.USER) {
+      const user = await getAllUserData(decoded.data.account_id);
+
+      if (!user) {
+        return returnResponse("User not found", null, res, 404);
+      }
+      //
+      req.body.user = { ...decoded.data, userId: decoded.data.account_id };
+      return next();
+    }
+
+    return returnResponse("Forbidden", null, res, 403);
+  } catch (error) {
+    return returnResponse("Invalid or expired token", error, res, 403);
+  }
+};
+
+const isAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Response | void => {
+  const token = getTokenFromHeader(req);
+  if (!token) {
+    return returnResponse("Access token is missing", null, res, 401);
+  }
+  try {
+    const decoded = jwt.verify(token, ENV.SECRET) as DecodedToken;
+    if (decoded.data.role === ROLE.ADMIN) {
+      //
+      req.body.user = { ...decoded.data, userId: decoded.data.account_id };
+      return next();
+    }
+    return returnResponse("Forbidden", null, res, 403);
+  } catch (error) {
+    return returnResponse("Invalid or expired token", error, res, 403);
+  }
+};
+
+const isLogin = async (req: Request, res: Response, next: NextFunction) => {
+  const token = getTokenFromHeader(req);
+  if (!token) {
+    return returnResponse("Access token is missing", null, res, 401);
+  }
+  try {
+    const decoded = jwt.verify(token, ENV.SECRET) as DecodedToken;
+    if (
+      decoded.data.role === ROLE.ADMIN ||
+      decoded.data.role === ROLE.USER ||
+      decoded.data.role === ROLE.SHOP
+    ) {
+      console.log({ ...decoded.data, userId: decoded.data.account_id })
+      const user = { ...decoded.data, userId: decoded.data.account_id }
+      req.body.user = user;
+      return next();
+    }
+    return returnResponse("Forbidden", null, res, 403);
+  } catch (error) {
+    return returnResponse("Invalid or expired token", error, res, 403);
+  }
+};
+
+const getAllUserData = async (_id: string) => {
+  const data = await User.findById({ _id });
+  return data;
+};
+export { isUser, isAdmin, isLogin };

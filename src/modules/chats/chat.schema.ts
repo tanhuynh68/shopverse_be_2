@@ -4,12 +4,12 @@ const { Schema } = mongoose;
 
 const chatRoomSchema = new Schema(
   {
-    customerId: {
+    firstUser: {
       type: Schema.Types.ObjectId,
       ref: "user",
       required: true,
     },
-    shopId: {
+    secondUser: {
       type: Schema.Types.ObjectId,
       ref: "user",
       required: true,
@@ -27,7 +27,7 @@ const chatRoomSchema = new Schema(
 );
 // only 1 cus + 1 shop
 chatRoomSchema.index(
-  { customerId: 1, shopId: 1 },
+  { firstUser: 1, secondUser: 1 },
   { unique: true }
 );
 

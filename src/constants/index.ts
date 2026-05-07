@@ -69,7 +69,9 @@ export const validateBody =
   (schema: ZodSchema) =>
   (req: Request, res: Response, next: NextFunction) => {
     try {
+      const user = req.body.user;
       req.body = schema.parse(req.body);
+      req.body.user = user;
       next();
     } catch (error) {
       if (error instanceof ZodError) {
@@ -78,7 +80,6 @@ export const validateBody =
           errors: error.issues,
         });
       }
-
       return res.status(500).json({
         message: "Internal error",
       });
