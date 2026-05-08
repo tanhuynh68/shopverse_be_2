@@ -1,8 +1,8 @@
 import express from "express";
-import { validateBody } from "../../constants/index.js";
+import { validateBody, validateParams } from "../../constants/index.js";
 import { isLogin } from "../../middlewares/jwt/jwt.middleware.js";
-import { createMediaValidate } from "./messages.middleware.js";
-import { createMessageMedia } from "./message.controller.js";
+import { createMediaValidate, createTextMessageValidate, getMessagesValidate } from "./messages.middleware.js";
+import { createMessageMedia, createTextMessage, getMessageByRoomId } from "./message.controller.js";
 import { upload } from "../../middlewares/upload.middleware.js";
 import { validateUploadFiles } from "../../middlewares/validateUpload.middleware.js";
 
@@ -17,4 +17,17 @@ messageRoute.post(
   createMessageMedia,
 );
 
+messageRoute.post(
+  "/",
+  isLogin,
+  validateBody(createTextMessageValidate),
+  createTextMessage,
+);
+
+messageRoute.get(
+  "/room/:roomId",
+  isLogin,
+  // validateParams(getMessagesValidate),
+  getMessageByRoomId,
+);
 export default messageRoute;

@@ -1,4 +1,4 @@
-import Message from "./message.schema.js";
+import Message, { MESSAGE_TYPE } from "./message.schema.js";
 
 export const createMessageMediaService = async (
   roomId: string,
@@ -15,3 +15,18 @@ export const createMessageMediaService = async (
   });
   return message;
 };
+
+export const createTextMessageService =async(roomId: string, message: string, sender: string)=>{
+  const textMessage = Message.create({message, roomId, type: MESSAGE_TYPE.TEXT, sender})
+  return textMessage;
+}
+
+export const getMessagesService =async(roomId: string, currentUser: string)=>{
+  const messages = await Message.find({roomId}).lean();
+  const formattedMessages = messages.map((message)=>{
+    return {
+      ...message, isMe: message.sender.toString() === currentUser ? true : false
+    }
+  })
+  return formattedMessages;
+}

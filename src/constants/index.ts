@@ -1,14 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodError, ZodSchema } from "zod";
-
-type SuccessStatusCode = 200 | 201;
-
-type ErrorData =
-  | {
-      message?: string;
-    }
-  | string
-  | unknown;
+import { AnyZodObject } from "zod/v3";
 
 export const returnResponse = <T>(
   message: string,
@@ -66,8 +58,7 @@ export const returnResponseQuery = <T>(
 };
 
 export const validateBody =
-  (schema: ZodSchema) =>
-  (req: any, res: Response, next: NextFunction) => {
+  (schema: ZodSchema) => (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = req.user;
       req.body = schema.parse(req.body);
@@ -78,6 +69,25 @@ export const validateBody =
         return res.status(400).json({
           message: "Validation failed",
           errors: error.issues,
+        });
+      }
+      return res.status(500).json({
+        message: "Internal error",
+      });
+    }
+  };
+
+export const validateParams =
+  (schema: ZodSchema) => (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = req.user;
+      schema.parse(req.params);
+      req.user = user;
+      next();
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          errors: error.flatten(),
         });
       }
       return res.status(500).json({

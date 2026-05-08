@@ -14,3 +14,19 @@ export const createMediaValidate = z.object({
     }
   ),
 });
+
+export const createTextMessageValidate = z.object({
+  roomId: z
+    .string()
+    .min(1, "roomId is required"),
+
+  message: z
+    .string()
+    .trim()
+    .min(1, "message is required")
+    .max(1000, "message too long"),
+});
+
+export const getMessagesValidate = z.object({
+  roomId: z.string().min(1, "roomId is required"),
+});

@@ -14,4 +14,7 @@ export const MESSAGES = {
   CREATE_MESSAGE_FAILED: "Create message failed!",
   CREATE_MEIDA_SUCCESSFULLY: "Create media successfully!",
   CREATE_MEDIA_FAILED: "Create media failed!",
+  // message
+  CREATE_TEXT_MESSAGE_SUCCESSFULLY: "Create text message successfully!",
+  CREATE_TEXT_MESSAGE_FAILED: "Create text message failed!",
 };
