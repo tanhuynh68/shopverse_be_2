@@ -38,7 +38,7 @@ const isUser = async (
 
   try {
     const decoded = jwt.verify(token, ENV.SECRET) as DecodedToken;
-    if (decoded.data.role === ROLE.USER) {
+    if (decoded.data.role === ROLE.CUSTOMER) {
       const user = await getAllUserData(decoded.data.account_id);
 
       if (!user) {
@@ -85,9 +85,7 @@ const isLogin = async (req: any, res: Response, next: NextFunction) => {
   try {
     const decoded = jwt.verify(token, ENV.SECRET) as DecodedToken;
     if (
-      decoded.data.role === ROLE.ADMIN ||
-      decoded.data.role === ROLE.USER ||
-      decoded.data.role === ROLE.SHOP
+      decoded.data.role === ROLE.ADMIN || decoded.data.role === ROLE.CUSTOMER || decoded.data.role === ROLE.SHOP
     ) {
       const user = { ...decoded.data, userId: decoded.data.account_id }
       req.body = req.body || {};

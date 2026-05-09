@@ -6,6 +6,9 @@ import connectDB from "./config/db.config.js";
 import env from "./config/env.config.js";
 import router from "./routes/index.js";
 
+
+// CONNECT DB
+connectDB();
 const app = express();
 const PORT = env.PORT || 9000;
 
@@ -78,6 +81,3 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
-
-// CONNECT DB
-connectDB();

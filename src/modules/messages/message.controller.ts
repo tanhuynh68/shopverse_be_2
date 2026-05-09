@@ -17,7 +17,7 @@ import { getOrderById } from "../orders/order.service.js";
 import {
   getProductByIdService,
   getProductByShopId,
-} from "../product/product.service.js";
+} from "../products/product.service.js";
 import { ROLE } from "../../constants/role.constant.js";
 
 export const createMessageMedia = async (req: any, res: Response) => {
@@ -138,7 +138,7 @@ export const sendProductMessage = async (req: Request, res: Response) => {
         return returnResponse(MESSAGES.PRODUCT_IS_NOT_YOURS, null, res, 400);
       }
     } //if current user is customer
-    if (role === ROLE.USER) {
+    if (role === ROLE.CUSTOMER) {
       // check product belong to shop who is chating with current user (customer or admin)
       const isProductBelongToShop = await getProductByShopId(productId, shopId);
       if (!isProductBelongToShop) {
