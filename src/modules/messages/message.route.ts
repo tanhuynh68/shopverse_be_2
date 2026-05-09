@@ -1,13 +1,13 @@
 import express from "express";
 import { validateBody, validateParams } from "../../constants/index.js";
 import { isLogin } from "../../middlewares/jwt/jwt.middleware.js";
-import { createMediaValidate, createTextMessageValidate, getMessagesValidate } from "./messages.middleware.js";
-import { createMessageMedia, createTextMessage, getMessageByRoomId } from "./message.controller.js";
+import { createMediaValidate, createTextMessageValidate, getMessagesValidate, sendOrderMessageValidate, sendProductMessageValidate } from "./messages.middleware.js";
+import { createMessageMedia, createTextMessage, getMessageByRoomId, sendOrderMessage, sendProductMessage } from "./message.controller.js";
 import { upload } from "../../middlewares/upload.middleware.js";
 import { validateUploadFiles } from "../../middlewares/validateUpload.middleware.js";
 
 const messageRoute = express.Router();
-// auto create room for customer and shop when first order created successfully!
+// user send image or video message in chat box
 messageRoute.post(
   "/upload",
   isLogin,
@@ -16,18 +16,35 @@ messageRoute.post(
   validateUploadFiles,
   createMessageMedia,
 );
-
+// user send text message in chat box
 messageRoute.post(
-  "/",
+  "/text",
   isLogin,
   validateBody(createTextMessageValidate),
   createTextMessage,
 );
 
+// user send order message in chat box
+messageRoute.post(
+  "/order",
+  isLogin,
+  validateBody(sendOrderMessageValidate),
+  sendOrderMessage,
+);
+
+// user send product message in chat box
+messageRoute.post(
+  "/product",
+  isLogin,
+  validateBody(sendProductMessageValidate),
+  sendProductMessage,
+);
+
+// get messages by roomId
 messageRoute.get(
   "/room/:roomId",
   isLogin,
-  // validateParams(getMessagesValidate),
   getMessageByRoomId,
 );
+
 export default messageRoute;

@@ -17,4 +17,12 @@ export const MESSAGES = {
   // message
   CREATE_TEXT_MESSAGE_SUCCESSFULLY: "Create text message successfully!",
   CREATE_TEXT_MESSAGE_FAILED: "Create text message failed!",
+  SEND_ORDER_MESSAGE_SUCCESSFULLY: "Send order message successfully!",
+  SEND_ORDER_MESSAGE_FAILED: "Send order message failed!",
+  SEND_PRODUCT_MESSAGE_SUCCESSFULLY: "Send product message successfully!",
+  SEND_PRODUCT_MESSAGE_FAILED: "Send product message failed!",
+  ORDER_NOT_FOUND: "Order not found!",
+  PRODUCT_NOT_FOUND: "Product not found!",
+  PRODUCT_IS_NOT_YOURS: "Product is not yours!",
+  PRODUCT_IS_NOT_BELONG_TO_SHOP: "Product is not belong to shop!",
 };

@@ -21,6 +21,16 @@ export const createTextMessageService =async(roomId: string, message: string, se
   return textMessage;
 }
 
+export const sendOrderMessageService =async(roomId: string, order: string, sender: string)=>{
+  const textMessage = (await Message.create({order, roomId, type: MESSAGE_TYPE.ORDER, sender}))
+  return textMessage;
+}
+
+export const sendProductMessageService =async(roomId: string, product: string, sender: string)=>{
+  const textMessage = (await Message.create({product, roomId, type: MESSAGE_TYPE.PRODUCT, sender}))
+  return textMessage;
+}
+
 export const getMessagesService =async(roomId: string, currentUser: string)=>{
   const messages = await Message.find({roomId}).lean();
   const formattedMessages = messages.map((message)=>{

@@ -7,10 +7,18 @@ import {
   createMessageMediaService,
   createTextMessageService,
   getMessagesService,
+  sendOrderMessageService,
+  sendProductMessageService,
 } from "./message.service.js";
 import ChatRoom from "../chats/chat.schema.js";
 import { getRoomById } from "../chats/chat.services.js";
 import { getMessagesValidate } from "./messages.middleware.js";
+import { getOrderById } from "../orders/order.service.js";
+import {
+  getProductByIdService,
+  getProductByShopId,
+} from "../product/product.service.js";
+import { ROLE } from "../../constants/role.constant.js";
 
 export const createMessageMedia = async (req: any, res: Response) => {
   try {
@@ -72,6 +80,100 @@ export const createTextMessage = async (req: Request, res: Response) => {
     );
   } catch (error) {
     return returnResponse(MESSAGES.CREATE_TEXT_MESSAGE_FAILED, error, res, 500);
+  }
+};
+
+/**
+ * user send order to chat box
+ * @param req
+ * @param res
+ * @returns order message
+ */
+export const sendOrderMessage = async (req: Request, res: Response) => {
+  try {
+    const { roomId, orderId } = req.body;
+    const { userId } = req.user!; // make sure req.user existed
+    // check room id existed or not
+    const isRoomExisted = await getRoomById(roomId);
+    if (!isRoomExisted) {
+      return returnResponse(MESSAGES.ROOM_NOT_FOUND, null, res, 404);
+    }
+    // check order id existed or not
+    const isOrderExisted = await getOrderById(orderId);
+    if (!isOrderExisted) {
+      return returnResponse(MESSAGES.ORDER_NOT_FOUND, null, res, 404);
+    }
+    //
+    const orderMessage = await sendOrderMessageService(roomId, orderId, userId);
+    return returnResponse(
+      MESSAGES.SEND_ORDER_MESSAGE_SUCCESSFULLY,
+      orderMessage,
+      res,
+      201,
+    );
+  } catch (error) {
+    return returnResponse(MESSAGES.SEND_ORDER_MESSAGE_FAILED, error, res, 500);
+  }
+};
+/**
+ * user send product to chat box
+ * @param req
+ * @param res
+ * @returns
+ */
+export const sendProductMessage = async (req: Request, res: Response) => {
+  try {
+    const { roomId, productId, shopId } = req.body;
+    const { userId, role } = req.user!; // make sure req.user existed
+    // check product id existed or not
+    const isProductExisted = await getProductByIdService(productId);
+    if (!isProductExisted) {
+      return returnResponse(MESSAGES.PRODUCT_NOT_FOUND, null, res, 404);
+    }
+    // current user is shop
+    if (role === ROLE.SHOP) {
+      // check product belong to shop who is current user
+      const isProductBelongToShop = await getProductByShopId(productId, userId);
+      if (!isProductBelongToShop) {
+        return returnResponse(MESSAGES.PRODUCT_IS_NOT_YOURS, null, res, 400);
+      }
+    } //if current user is customer
+    if (role === ROLE.USER) {
+      // check product belong to shop who is chating with current user (customer or admin)
+      const isProductBelongToShop = await getProductByShopId(productId, shopId);
+      if (!isProductBelongToShop) {
+        return returnResponse(
+          MESSAGES.PRODUCT_IS_NOT_BELONG_TO_SHOP,
+          null,
+          res,
+          400,
+        );
+      }
+    }
+    // check room id existed or not
+    const isRoomExisted = await getRoomById(roomId);
+    if (!isRoomExisted) {
+      return returnResponse(MESSAGES.ROOM_NOT_FOUND, null, res, 404);
+    }
+    //
+    const productMessage = await sendProductMessageService(
+      roomId,
+      productId,
+      userId,
+    );
+    return returnResponse(
+      MESSAGES.SEND_PRODUCT_MESSAGE_SUCCESSFULLY,
+      productMessage,
+      res,
+      201,
+    );
+  } catch (error) {
+    return returnResponse(
+      MESSAGES.SEND_PRODUCT_MESSAGE_FAILED,
+      error,
+      res,
+      500,
+    );
   }
 };
 
