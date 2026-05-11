@@ -8,6 +8,6 @@ const router =express.Router();
 
 router.use('/rooms', roomRoute)
 router.use('/messages', messageRoute)
-router.use('/wishlist', wishlistRoute)
+router.use('/wishlists', wishlistRoute)
 
 export default router;

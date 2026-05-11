@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import { getProductByIdService } from "../product/product.service.js";
-import { returnResponse, returnResponseQuery } from "../../constants/index.js";
+import { getProductByIdService } from "../products/product.service.js";
 import { MESSAGES } from "../../messages/index.js";
 import {
   addProductToWishlistService,
@@ -9,6 +8,7 @@ import {
   getUserWishList,
   getWishListByIdService,
 } from "./wish-list.service.js";
+import { returnResponse } from "../../utils/return.util.js";
 
 /**
  * add 1 product into current user's wishlist (1 product with 1 user = 1 document in wishlist collecion)
@@ -55,7 +55,7 @@ export const addProductToWishlist = async (req: Request, res: Response) => {
  * @param res
  * @returns
  */
-export const deleleProductFromWishList = async (
+export const deleteProductFromWishList = async (
   req: Request,
   res: Response,
 ) => {
@@ -96,14 +96,14 @@ export const deleleProductFromWishList = async (
  * @param res
  * @returns
  */
-export const deleleProductsFromWishList = async (
+export const deleteProductsFromWishList = async (
   req: Request,
   res: Response,
 ) => {
   try {
     const { userId } = req.user!;
     const { wishlistId } = req.body;
-    // delete manay product in wishlist by wilishIds and userId
+    // delete many product in wishlist by wishlistIds and userId
     const deleteProducts = await deleteProductsFromWishListService(
       wishlistId,
       userId,

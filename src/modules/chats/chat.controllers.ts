@@ -3,9 +3,9 @@ import {
   createChatRoomService,
   customerGetRoomsService,
 } from "./chat.services.js";
-import { returnResponse } from "../../constants/index.js";
 import { MESSAGES } from "../../messages/index.js";
 import { getUserByIdService } from "../users/users.service.js";
+import { returnResponse } from "../../utils/return.util.js";
 
 export const createRoom = async (req: any, res: Response) => {
   try {

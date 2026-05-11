@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { returnResponse } from "../../constants/index.js";
 import { uploadToCloudinary } from "../../utils/cloudinary.util.js";
 import { MESSAGES } from "../../messages/index.js";
 import { MESSAGE_TYPE } from "./message.schema.js";
@@ -19,6 +18,7 @@ import {
   getProductByShopId,
 } from "../products/product.service.js";
 import { ROLE } from "../../constants/role.constant.js";
+import { returnResponse } from "../../utils/return.util.js";
 
 export const createMessageMedia = async (req: any, res: Response) => {
   try {
@@ -35,7 +35,7 @@ export const createMessageMedia = async (req: any, res: Response) => {
     if (!files?.length) {
       return returnResponse("Files required", null, res, 400);
     }
-    // upload files to clouldinary
+    // upload files to cloudinary
     const mediaUrls = await Promise.all(
       files.map((file) => uploadToCloudinary(file.buffer, "chat")),
     );
@@ -52,7 +52,7 @@ export const createMessageMedia = async (req: any, res: Response) => {
     });
     //
     return returnResponse(
-      MESSAGES.CREATE_MEIDA_SUCCESSFULLY,
+      MESSAGES.CREATE_MEDIA_SUCCESSFULLY,
       messages,
       res,
       201,
@@ -139,7 +139,7 @@ export const sendProductMessage = async (req: Request, res: Response) => {
       }
     } //if current user is customer
     if (role === ROLE.CUSTOMER) {
-      // check product belong to shop who is chating with current user (customer or admin)
+      // check product belong to shop who is chatting with current user (customer or admin)
       const isProductBelongToShop = await getProductByShopId(productId, shopId);
       if (!isProductBelongToShop) {
         return returnResponse(

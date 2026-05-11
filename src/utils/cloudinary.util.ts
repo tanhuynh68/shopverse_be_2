@@ -2,7 +2,7 @@
 
 
 import streamifier from "streamifier";
-import cloudinary from "../config/cloudinary.config.js";
+import cloudinary from "../configs/cloudinary.config.js";
 
 export const uploadToCloudinary = (
   fileBuffer: Buffer,

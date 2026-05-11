@@ -1,15 +1,15 @@
 import express from "express";
-import { validateBody } from "../../constants/index.js";
-import { isLogin, isUser } from "../../middlewares/jwt/jwt.middleware.js";
-import { addProductToWishlist, deleleProductFromWishList, deleleProductsFromWishList, getMyWishList } from "./wish-list.controller.js";
-import { addProductToWishlistSchema, deleleProductFromWishListSchema, deleleProductsFromWishListSchema } from "./wish-list.middleware.js";
+import { isUser } from "../../middlewares/jwt/jwt.middleware.js";
+import { addProductToWishlist, deleteProductFromWishList, deleteProductsFromWishList, getMyWishList } from "./wish-list.controller.js";
+import { addProductToWishlistSchema, deleteProductFromWishListSchema, deleteProductsFromWishListSchema, } from "./wish-list.middleware.js";
+import { validateBody } from "../../utils/validate.util.js";
 
 const wishlistRoute = express.Router();
 
 // add product to wishlist
 wishlistRoute.post("/", isUser, validateBody(addProductToWishlistSchema), addProductToWishlist);
-wishlistRoute.delete("/", isUser, validateBody(deleleProductFromWishListSchema), deleleProductFromWishList);
-wishlistRoute.delete("/many", isUser, validateBody(deleleProductsFromWishListSchema), deleleProductsFromWishList);
+wishlistRoute.delete("/", isUser, validateBody(deleteProductFromWishListSchema), deleteProductFromWishList);
+wishlistRoute.delete("/many", isUser, validateBody(deleteProductsFromWishListSchema), deleteProductsFromWishList);
 wishlistRoute.post("/", isUser, getMyWishList);
 
 export default wishlistRoute;

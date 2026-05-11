@@ -1,8 +1,8 @@
 import express from "express";
 import { createRoom, userGetRooms } from "./chat.controllers.js";
-import { validateBody } from "../../constants/index.js";
-import { createRoomSchema, userGetRoomsSchema } from "./chat.middleware.js";
+import { createRoomSchema } from "./chat.middleware.js";
 import { isLogin } from "../../middlewares/jwt/jwt.middleware.js";
+import { validateBody } from "../../utils/validate.util.js";
 
 const roomRoute = express.Router();
 

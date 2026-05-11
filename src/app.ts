@@ -2,8 +2,8 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
-import connectDB from "./config/db.config.js";
-import env from "./config/env.config.js";
+import connectDB from "./configs/db.config.js";
+import env from "./configs/env.config.js";
 import router from "./routes/index.js";
 
 
