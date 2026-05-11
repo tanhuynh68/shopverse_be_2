@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodError, ZodSchema } from "zod";
-import { AnyZodObject } from "zod/v3";
 
 export const returnResponse = <T>(
   message: string,
