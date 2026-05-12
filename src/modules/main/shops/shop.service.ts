@@ -29,12 +29,20 @@ export const sendRequestService = async (
   return shop;
 };
 
-export const updateStatusService = async (owner: string, status: ShopStatus) => {
-  const shop = await Shop.findByIdAndUpdate(owner, { status }, { new: true });
+export const updateStatusService = async (
+  owner: string,
+  approvalStatus: ShopStatus,
+  rejectReason?: string,
+) => {
+  const shop = await Shop.findByIdAndUpdate(
+    owner,
+    { approvalStatus, rejectReason },
+    { new: true },
+  );
   return shop;
 };
 
 export const getShopByOwnerId = async (owner: string) => {
   const shop = await Shop.findById(owner);
   return shop;
-}; 
+};

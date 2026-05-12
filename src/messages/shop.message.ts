@@ -1,12 +1,16 @@
 export const SHOP_MESSAGES = {
   SHOP_NAME_EXISTED: "Shop name existed!",
   SHOP_NOT_FOUND: "Shop not found!",
-  SHOP_APPROVED: "Shop not found!",
+  SHOP_HAS_BEEN_APPROVED: "Shop has been approved!",
+  SHOP_HAS_BEEN_REJECTED: "Shop has been rejected!",
+  SHOP_APPROVAL_STATUS_MUST_BE_PENDING: "Shop approval status must be pending!",
+  SHOP_HAS_BEEN_REJECTED_PLEASE_CREATE_NEW_REQUEST: "Shop has been rejected, please create new request!",
   SHOP_HOLINE_EXISTED: "Shop name existed!",
   REQUEST_CREATE_SHOP_FAILED: "Request create shop failed",
   REQUEST_CREATE_SHOP_SUCCESSFULLY: "Request create shop succesfully!",
   APPROVE_CREATE_SHOP_FAILED: "Approve create shop failed",
   APPROVE_CREATE_SHOP_SUCCESSFULLY: "Approve create shop succesfully!",
-  UPDATE_STATUS_FAILED: "Upodate status approved shop failed",
+  UPDATE_STATUS_APPROVED_FAILED: "Upodate status approved shop failed",
+  UPDATE_STATUS_REJECTED_FAILED: "Upodate status rejected shop failed",
   ADD_ROLE_SHOP_FAILED: "Add role shop failed",
 };

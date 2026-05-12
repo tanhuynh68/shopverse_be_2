@@ -10,5 +10,5 @@ const shopRoute = express.Router();
 shopRoute.post("/request", isUser, validateBody(userRequestBecomeShopValidate), userRequestBecomeShop);
 // admin approve req become shop of user
 shopRoute.post("/aprrove", isAdmin, validateBody(adminApproveRequestValidate), adminApproveRequest);
-
+shopRoute.post("/reject", isAdmin, validateBody(adminApproveRequestValidate), adminApproveRequest);
 export default shopRoute;

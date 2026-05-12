@@ -49,9 +49,9 @@ const shopSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    status: {
+    approvalStatus: {
       type: String,
-      enum: ["PENDING", "APPROVED", "REJECTED"],
+      enum: ["PENDING", "APPROVED", "REJECTED"], // Pending => Approved || Pending => Rejected => Pending => Approved
       default: "PENDING",
     },
     rejectReason: String,
