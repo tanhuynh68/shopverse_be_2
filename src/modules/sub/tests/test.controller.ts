@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { createBrandService, createCateService } from "./test.service.js";
-import { returnResponse } from "../../utils/return.util.js";
+import { returnResponse } from "../../../utils/return.util.js";
 
 export const createBrand = async (req: Request, res: Response) => {
   try {

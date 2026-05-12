@@ -1,8 +1,9 @@
-
 export const ROOM_MESSAGES = {
     CREATE_ROOM_SUCCESSFULLY: "Create room successfully!",
     CREATE_ROOM_FAILED: "Create room failed!",
     USER_NOT_FOUND: "User not found!",
+    USER_HAS_BEEN_DELETED: 'User has been deleted!',
+    USER_INACTIVE: "User account is inactive!",
     ROOM_NOT_FOUND: "Room not found!",
     //
     GET_ROOMS_SUCCESSFULLY: "Get rooms successfully!",

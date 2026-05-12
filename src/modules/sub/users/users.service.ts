@@ -1,0 +1,13 @@
+import { ROLE } from "../../../constants/role.constant.js";
+import User from "./users.schema.js"
+
+// for user and shop
+export const getUserByIdService = async(_id: string)=>{
+    const user = User.findById(_id);
+    return user;
+}
+
+export const addRoleShop = async(_id: string)=>{
+    const user = User.findByIdAndUpdate(_id, {role: [ROLE.CUSTOMER, ROLE.SHOP]}, {new: true});
+    return user;
+}

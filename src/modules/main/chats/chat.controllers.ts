@@ -3,10 +3,16 @@ import {
   createChatRoomService,
   customerGetRoomsService,
 } from "./chat.services.js";
-import { MESSAGES } from "../../messages/index.js";
-import { getUserByIdService } from "../users/users.service.js";
-import { returnResponse } from "../../utils/return.util.js";
+import { getUserByIdService } from "../../sub/users/users.service.js";
+import { MESSAGES } from "../../../messages/index.js";
+import { returnResponse } from "../../../utils/return.util.js";
 
+/**
+ * 
+ * @param req 
+ * @param res 
+ * @returns 
+ */
 export const createRoom = async (req: any, res: Response) => {
   try {
     // get id from user logged in;
@@ -26,10 +32,15 @@ export const createRoom = async (req: any, res: Response) => {
   }
 };
 
+/**
+ * user get room list to show on chat sidebar
+ * @param req 
+ * @param res 
+ * @returns 
+ */
 export const userGetRooms = async (req: any, res: Response) => {
   try {
     const { userId, role } = req.user;
-    console.log({ userId, role })
     //
     const rooms = await customerGetRoomsService(userId, role);
     return returnResponse(MESSAGES.GET_ROOMS_SUCCESSFULLY, rooms, res, 200);

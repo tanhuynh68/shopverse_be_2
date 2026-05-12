@@ -1,7 +1,7 @@
 // src/middlewares/validateUpload.middleware.ts
 
 import { Request, Response, NextFunction } from "express";
-import { MESSAGE_TYPE } from "../modules/messages/message.schema.js";
+import { MESSAGE_TYPE } from "../modules/main/messages/message.schema.js";
 
 export const validateUploadFiles = (
   req: Request,

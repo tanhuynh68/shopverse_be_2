@@ -2,7 +2,7 @@ import ENV from "../../configs/env.config.js";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { ROLE } from "../../constants/role.constant.js";
-import User from "../../modules/users/users.schema.js";
+import User from "../../modules/sub/users/users.schema.js";
 import { returnResponse } from "../../utils/return.util.js";
 
 interface DecodedToken extends JwtPayload {
@@ -12,6 +12,9 @@ interface DecodedToken extends JwtPayload {
     name: string;
     account_id: string;
     isPasswordExisted: boolean;
+    isActive: boolean,
+    isDeleted: boolean,
+    phone: string
   };
 }
 
@@ -40,9 +43,12 @@ const isUser = async (
     const decoded = jwt.verify(token, ENV.SECRET) as DecodedToken;
     if (decoded.data.role === ROLE.CUSTOMER) {
       const user = await getAllUserData(decoded.data.account_id);
-
-      if (!user) {
+      // user is not exist or user has been sort deleted by admin
+      if (!user || !user.isDeleted) {
         return returnResponse("User not found", null, res, 404);
+      }
+      if (user.isActive === false) {
+        return returnResponse("Account has not been activated yet!", null, res, 400);
       }
       //
       req.user = { ...decoded.data, userId: decoded.data.account_id };
@@ -64,9 +70,10 @@ const isAdmin = (
   if (!token) {
     return returnResponse("Access token is missing", null, res, 401);
   }
+
   try {
     const decoded = jwt.verify(token, ENV.SECRET) as DecodedToken;
-    console.log('decoded: ', decoded)
+    console.log("decoded: ", decoded);
     if (decoded.data.role === ROLE.ADMIN) {
       //
       req.user = { ...decoded.data, userId: decoded.data.account_id };
@@ -86,9 +93,11 @@ const isLogin = async (req: any, res: Response, next: NextFunction) => {
   try {
     const decoded = jwt.verify(token, ENV.SECRET) as DecodedToken;
     if (
-      decoded.data.role === ROLE.ADMIN || decoded.data.role === ROLE.CUSTOMER || decoded.data.role === ROLE.SHOP
+      decoded.data.role === ROLE.ADMIN ||
+      decoded.data.role === ROLE.CUSTOMER ||
+      decoded.data.role === ROLE.SHOP
     ) {
-      const user = { ...decoded.data, userId: decoded.data.account_id }
+      const user = { ...decoded.data, userId: decoded.data.account_id };
       req.body = req.body || {};
       req.user = user;
       return next();
@@ -103,4 +112,5 @@ const getAllUserData = async (_id: string) => {
   const data = await User.findById({ _id });
   return data;
 };
+
 export { isUser, isAdmin, isLogin };

@@ -1,9 +1,13 @@
 import { ROOM_MESSAGES } from "./room.message.js";
+import { SHOP_MESSAGES } from "./shop.message.js";
+import { VALIDATE_MESSAGES } from "./validate.messages.js";
 import { WISHLIST_MESSAGES } from "./wish-list.message.js";
 
 export const MESSAGES = {
   ...ROOM_MESSAGES,
   ...WISHLIST_MESSAGES,
+  ...SHOP_MESSAGES,
+  ...VALIDATE_MESSAGES,
   // message
   CREATE_TEXT_MESSAGE_SUCCESSFULLY: "Create text message successfully!",
   CREATE_TEXT_MESSAGE_FAILED: "Create text message failed!",

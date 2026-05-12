@@ -1,8 +1,8 @@
 import express from "express";
-import { isUser } from "../../middlewares/jwt/jwt.middleware.js";
+import { isUser } from "../../../middlewares/jwt/jwt.middleware.js";
 import { addProductToWishlist, deleteProductFromWishList, deleteProductsFromWishList, getMyWishList } from "./wish-list.controller.js";
 import { addProductToWishlistSchema, deleteProductFromWishListSchema, deleteProductsFromWishListSchema, } from "./wish-list.middleware.js";
-import { validateBody } from "../../utils/validate.util.js";
+import { validateBody } from "../../../utils/validate.util.js";
 
 const wishlistRoute = express.Router();
 

@@ -1,5 +1,5 @@
-import ChatRoom from "../modules/chats/chat.schema.js";
-import Message from "../modules/messages/message.schema.js";
+import ChatRoom from "../modules/main/chats/chat.schema.js";
+import Message from "../modules/main/messages/message.schema.js";
 import { Server, Socket } from "socket.io";
 
 const socketHandler = (io: Server) => {

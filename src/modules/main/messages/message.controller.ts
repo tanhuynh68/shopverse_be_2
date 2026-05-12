@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { uploadToCloudinary } from "../../utils/cloudinary.util.js";
-import { MESSAGES } from "../../messages/index.js";
+import { uploadToCloudinary } from "../../../utils/cloudinary.util.js";
+import { MESSAGES } from "../../../messages/index.js";
 import { MESSAGE_TYPE } from "./message.schema.js";
 import {
   createMessageMediaService,
@@ -12,13 +12,13 @@ import {
 import ChatRoom from "../chats/chat.schema.js";
 import { getRoomById } from "../chats/chat.services.js";
 import { getMessagesValidate } from "./messages.middleware.js";
-import { getOrderById } from "../orders/order.service.js";
+import { getOrderById } from "../../sub/orders/order.service.js";
 import {
   getProductByIdService,
   getProductByShopId,
-} from "../products/product.service.js";
-import { ROLE } from "../../constants/role.constant.js";
-import { returnResponse } from "../../utils/return.util.js";
+} from "../../sub/products/product.service.js";
+import { ROLE } from "../../../constants/role.constant.js";
+import { returnResponse } from "../../../utils/return.util.js";
 
 export const createMessageMedia = async (req: any, res: Response) => {
   try {
