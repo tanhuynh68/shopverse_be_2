@@ -1,7 +1,11 @@
 import WishList from "./wish-list.schema.js";
 
-export const addProductToWishlistService = async (productId: string, userId: string) => {
+export const addProductToWishlistService = async (
+  productId: string,
+  userId: string,
+) => {
   const wishlist = await WishList.create({ product: productId, user: userId });
+  console.log(wishlist);
   return wishlist;
 };
 
@@ -20,12 +24,18 @@ export const deleteProductFromWishListByIdService = async (_id: string) => {
   return wishlist;
 };
 
-export const deleteProductsFromWishListService = async (wishlistIds: string, user: string) => {
+export const deleteProductsFromWishListService = async (
+  wishlistIds: string[],
+  user: string,
+) => {
   const result = await WishList.deleteMany({ _id: { $in: wishlistIds }, user });
   return result.deletedCount;
 };
 
 export const getUserWishList = async (userId: string) => {
-  const wishlist = await WishList.find({ user: userId });
+  const wishlist = await WishList.find({ user: userId }).populate({
+    path: "product",
+    populate: [{ path: "brand_id" }, { path: "category_id" }],
+  });
   return wishlist;
 };

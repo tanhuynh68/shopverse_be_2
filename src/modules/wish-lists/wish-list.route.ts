@@ -10,6 +10,6 @@ const wishlistRoute = express.Router();
 wishlistRoute.post("/", isUser, validateBody(addProductToWishlistSchema), addProductToWishlist);
 wishlistRoute.delete("/", isUser, validateBody(deleteProductFromWishListSchema), deleteProductFromWishList);
 wishlistRoute.delete("/many", isUser, validateBody(deleteProductsFromWishListSchema), deleteProductsFromWishList);
-wishlistRoute.post("/", isUser, getMyWishList);
+wishlistRoute.get("/", isUser, getMyWishList);
 
 export default wishlistRoute;

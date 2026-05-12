@@ -1,4 +1,4 @@
-import Product from "./product.schma.js";
+import Product from "./product.schema.js";
 
 export const getProductByIdService = async (productId: string) => {
   const product = await Product.findById(productId);

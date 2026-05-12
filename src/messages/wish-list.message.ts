@@ -12,4 +12,5 @@ export const WISHLIST_MESSAGES = {
   WISHLIST_IS_NOT_YOURS: "Wishlist is not yours!",
   GET_WISHLIST_SUCCESSFULLY: "Get wishlist successfully!",
   GET_WISHLIST_FAILED: "Get wishlist failed!",
+  PRODUCT_IS_EXISTED_IN_WISHLIST: "Product is existed in wishlist!",
 }

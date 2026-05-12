@@ -7,6 +7,7 @@ import {
   deleteProductsFromWishListService,
   getUserWishList,
   getWishListByIdService,
+  getWishListService,
 } from "./wish-list.service.js";
 import { returnResponse } from "../../utils/return.util.js";
 
@@ -20,9 +21,15 @@ export const addProductToWishlist = async (req: Request, res: Response) => {
   try {
     const { userId } = req.user!;
     const { productId } = req.body;
+    // check product isExisted
     const product = await getProductByIdService(productId);
     if (!product) {
       return returnResponse(MESSAGES.PRODUCT_NOT_FOUND, null, res, 404);
+    }
+    // check product, if existed in wishlist of current user => return 400
+    const isProductInWishList = await getWishListService(productId, userId);
+    if(isProductInWishList){
+      return returnResponse(MESSAGES.PRODUCT_IS_EXISTED_IN_WISHLIST, null, res, 400);
     }
     // check active of product
     if (product.isActive === false) {
@@ -32,6 +39,7 @@ export const addProductToWishlist = async (req: Request, res: Response) => {
     if (product.isDeleted === true) {
       return returnResponse(MESSAGES.PRODUCT_IS_DELETED, null, res, 400);
     }
+    // add product to wishlisgt
     const wishlist = await addProductToWishlistService(productId, userId);
     return returnResponse(
       MESSAGES.ADD_PRODUCT_TO_WISHLIST_SUCCESSFULLY,
@@ -75,14 +83,14 @@ export const deleteProductFromWishList = async (
     const deleteProduct =
       await deleteProductFromWishListByIdService(wishlistId);
     return returnResponse(
-      MESSAGES.ADD_PRODUCT_TO_WISHLIST_SUCCESSFULLY,
+      MESSAGES.DELETE_PRODUCT_FROM_WISHLIST_SUCCESSFULLY,
       deleteProduct,
       res,
       200,
     );
   } catch (error) {
     return returnResponse(
-      MESSAGES.ADD_PRODUCT_TO_WISHLIST_FAILED,
+      MESSAGES.DELETE_PRODUCT_FROM_WISHLIST_FAILED,
       error,
       res,
       500,
@@ -102,10 +110,10 @@ export const deleteProductsFromWishList = async (
 ) => {
   try {
     const { userId } = req.user!;
-    const { wishlistId } = req.body;
+    const { wishlistIds } = req.body;
     // delete many product in wishlist by wishlistIds and userId
     const deleteProducts = await deleteProductsFromWishListService(
-      wishlistId,
+      wishlistIds,
       userId,
     );
     return returnResponse(
@@ -135,14 +143,14 @@ export const getMyWishList = async (req: Request, res: Response) => {
     const { userId } = req.user!;
     const getWishList = await getUserWishList(userId);
     return returnResponse(
-      MESSAGES.DELETE_PRODUCTS_FROM_WISHLIST_SUCCESSFULLY,
+      MESSAGES.GET_WISHLIST_SUCCESSFULLY,
       getWishList,
       res,
       200,
     );
   } catch (error) {
     return returnResponse(
-      MESSAGES.DELETE_PRODUCTS_FROM_WISHLIST_FAILED,
+      MESSAGES.GET_MESSAGES_FAILED,
       error,
       res,
       500,

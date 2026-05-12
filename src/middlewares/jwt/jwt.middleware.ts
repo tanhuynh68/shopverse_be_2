@@ -1,9 +1,9 @@
 import ENV from "../../configs/env.config.js";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
-import { returnResponse } from "../../constants/index.js";
 import { ROLE } from "../../constants/role.constant.js";
 import User from "../../modules/users/users.schema.js";
+import { returnResponse } from "../../utils/return.util.js";
 
 interface DecodedToken extends JwtPayload {
   data: {
@@ -66,6 +66,7 @@ const isAdmin = (
   }
   try {
     const decoded = jwt.verify(token, ENV.SECRET) as DecodedToken;
+    console.log('decoded: ', decoded)
     if (decoded.data.role === ROLE.ADMIN) {
       //
       req.user = { ...decoded.data, userId: decoded.data.account_id };

@@ -46,7 +46,7 @@ const wishlistSchema = new Schema<IWishlist>(
 
 // create wishlist with 1 userId and 1 productId 1 time
 wishlistSchema.index(
-  { userId: 1, productId: 1 },
+  { user: 1, product: 1 },
   { unique: true }
 );
 const WishList = model<IWishlist>("Wishlist", wishlistSchema);
