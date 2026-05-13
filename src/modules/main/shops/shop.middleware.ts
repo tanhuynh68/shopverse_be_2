@@ -19,6 +19,21 @@ export const userRequestBecomeShopValidate = z.object({
 });
 
 export const adminApproveRequestValidate = z.object({
-  owner: z
-    .string('owner is required')
+  owner: z.string("owner is required"),
+});
+
+export const adminRejectRequestValidate = z.object({
+  owner: z.string("owner is required"),
+  rejectReason: z
+    .string("rejectReason is required")
+    .min(10, MESSAGES.SHOP_NAME_MIN)
+    .max(200, MESSAGES.SHOP_NAME_MAX),
+});
+
+export const adminGetRequestsValidate = z.object({
+  owner: z.string("owner must be a string"),
+
+  approvalStatus: z.array(z.string(), "approvalStatus must be an array"),
+
+  isDeleted: z.boolean("isDeleted must be a boolean"),
 });

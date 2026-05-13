@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { normalizeShopName } from "../../../utils/format.ultil.js";
 import {
+  adminGetRequestsService,
   getShopByHotline,
   getShopByNormalizeName,
   getShopByOwnerId,
@@ -9,7 +10,10 @@ import {
 } from "./shop.service.js";
 import { returnResponse } from "../../../utils/return.util.js";
 import { MESSAGES } from "../../../messages/index.js";
-import { SHOP_STATUS } from "../../../constants/shop.constant.js";
+import {
+  SHOP_APPROVAL_STATUS,
+  ShopApprovalStatus,
+} from "../../../constants/shop.constant.js";
 import {
   addRoleShop,
   getUserByIdService,
@@ -90,12 +94,20 @@ export const adminApproveRequest = async (req: Request, res: Response) => {
     if (!isShopExisted) {
       return returnResponse(MESSAGES.SHOP_NOT_FOUND, null, res, 404);
     }
-      // shop status must be pending to admin reject
-    if (isShopExisted.approvalStatus != SHOP_STATUS.PENDING) {
-      return returnResponse(MESSAGES.SHOP_APPROVAL_STATUS_MUST_BE_PENDING, null, res, 400);
+    // shop status must be pending to admin reject
+    if (isShopExisted.approvalStatus != SHOP_APPROVAL_STATUS.PENDING) {
+      return returnResponse(
+        MESSAGES.SHOP_APPROVAL_STATUS_MUST_BE_PENDING,
+        null,
+        res,
+        400,
+      );
     }
     // update status to approved
-    const updateStatus = await updateStatusService(owner, SHOP_STATUS.APPROVED);
+    const updateStatus = await updateStatusService(
+      owner,
+      SHOP_APPROVAL_STATUS.APPROVED,
+    );
     if (!updateStatus) {
       return returnResponse(
         MESSAGES.UPDATE_STATUS_APPROVED_FAILED,
@@ -127,7 +139,7 @@ export const adminApproveRequest = async (req: Request, res: Response) => {
 
 /**
  * admin reject pending request become shop of user
- * @param req ]
+ * @param req
  * @param res
  * @returns
  */
@@ -153,13 +165,18 @@ export const adminRejectRequest = async (req: Request, res: Response) => {
       return returnResponse(MESSAGES.SHOP_NOT_FOUND, null, res, 404);
     }
     // shop status must be pending to admin reject
-    if (isShopExisted.approvalStatus != SHOP_STATUS.PENDING) {
-      return returnResponse(MESSAGES.SHOP_APPROVAL_STATUS_MUST_BE_PENDING, null, res, 400);
+    if (isShopExisted.approvalStatus != SHOP_APPROVAL_STATUS.PENDING) {
+      return returnResponse(
+        MESSAGES.SHOP_APPROVAL_STATUS_MUST_BE_PENDING,
+        null,
+        res,
+        400,
+      );
     }
     // update status to rejected
     const updateStatus = await updateStatusService(
       owner,
-      SHOP_STATUS.REJECTED,
+      SHOP_APPROVAL_STATUS.REJECTED,
       rejectReason,
     );
     if (!updateStatus) {
@@ -188,5 +205,56 @@ export const adminRejectRequest = async (req: Request, res: Response) => {
     );
   } catch (error) {
     return returnResponse(MESSAGES.APPROVE_CREATE_SHOP_FAILED, error, res, 500);
+  }
+};
+
+/**
+ * admin get requests of users want to become shop
+ * @param req
+ * @param res
+ * @returns
+ */
+export const adminGetRequests = async (req: Request, res: Response) => {
+  try {
+    const { owner, approvalStatus, isDeleted } = req.body;
+    // check owner (shop id) is existed or not ?
+    if (!owner || owner === null) {
+      return returnResponse(MESSAGES.SHOP_NOT_FOUND, null, res, 404);
+    }
+    // check shop approval status is exist or not
+    if (approvalStatus.length > 0) {
+      approvalStatus.map((item: ShopApprovalStatus) => {
+        if (
+          item != SHOP_APPROVAL_STATUS.APPROVED &&
+          item != SHOP_APPROVAL_STATUS.REJECTED &&
+          item != SHOP_APPROVAL_STATUS.PENDING
+        )
+          return returnResponse(
+            MESSAGES.SHOP_APPROVAL_STATUS_IS_NOT_EXIST,
+            null,
+            res,
+            404,
+          );
+      });
+    }
+    // get request user become shop
+    const requests = await adminGetRequestsService(
+      owner,
+      isDeleted,
+      approvalStatus,
+    );
+    return returnResponse(
+      MESSAGES.ADMIN_GET_REQUEST_USER_BECOME_SHOP_SUCCESSFULLY,
+      requests,
+      res,
+      200,
+    );
+  } catch (error) {
+    return returnResponse(
+      MESSAGES.ADMIN_GET_REQUEST_USER_BECOME_SHOP_FAILED,
+      error,
+      res,
+      500,
+    );
   }
 };

@@ -6,7 +6,6 @@ import connectDB from "./configs/db.config.js";
 import env from "./configs/env.config.js";
 import router from "./routes/index.js";
 
-
 // CONNECT DB
 connectDB();
 const app = express();

@@ -3,7 +3,7 @@ dotenv.config();
 const ENV = {
   PORT: process.env.PORT || 6000,
   DB_PASSWORD: process.env.DB_PASSWORD,
-  TOKEN_EXPIRED: process.env.TOKEN_EXPIRED,
+  TOKEN_EXPIRED: process.env.TOKEN_EXPIRED as string,
   SECRET: process.env.SECRET as string,
   // cloudinary
   CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,

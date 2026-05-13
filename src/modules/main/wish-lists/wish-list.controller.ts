@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getProductByIdService } from "../../sub/products/product.service.js";
-import { MESSAGES } from "../messages/index.js.js";
+
 import {
   addProductToWishlistService,
   deleteProductFromWishListByIdService,
@@ -10,6 +10,7 @@ import {
   getWishListService,
 } from "./wish-list.service.js";
 import { returnResponse } from "../../../utils/return.util.js";
+import { MESSAGES } from "../../../messages/index.js";
 
 /**
  * add 1 product into current user's wishlist (1 product with 1 user = 1 document in wishlist collecion)

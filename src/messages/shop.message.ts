@@ -1,3 +1,4 @@
+
 export const SHOP_MESSAGES = {
   SHOP_NAME_EXISTED: "Shop name existed!",
   SHOP_NOT_FOUND: "Shop not found!",
@@ -13,4 +14,7 @@ export const SHOP_MESSAGES = {
   UPDATE_STATUS_APPROVED_FAILED: "Upodate status approved shop failed",
   UPDATE_STATUS_REJECTED_FAILED: "Upodate status rejected shop failed",
   ADD_ROLE_SHOP_FAILED: "Add role shop failed",
+  SHOP_APPROVAL_STATUS_IS_NOT_EXIST: "Shop approval status!",
+  ADMIN_GET_REQUEST_USER_BECOME_SHOP_FAILED: 'admin get request user become shop faield',
+  ADMIN_GET_REQUEST_USER_BECOME_SHOP_SUCCESSFULLY: 'Admin get request user become shop successfully!',
 };

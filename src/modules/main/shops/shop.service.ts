@@ -1,6 +1,6 @@
 import { ObjectId } from "mongoose";
 import Shop from "./shop.schema.js";
-import { SHOP_STATUS, ShopStatus } from "../../../constants/shop.constant.js";
+import { ShopApprovalStatus } from "../../../constants/shop.constant.js";
 
 export const getShopByNormalizeName = async (name: string) => {
   const shop = await Shop.findOne({ normalizedName: name });
@@ -31,7 +31,7 @@ export const sendRequestService = async (
 
 export const updateStatusService = async (
   owner: string,
-  approvalStatus: ShopStatus,
+  approvalStatus: ShopApprovalStatus,
   rejectReason?: string,
 ) => {
   const shop = await Shop.findByIdAndUpdate(
@@ -44,5 +44,31 @@ export const updateStatusService = async (
 
 export const getShopByOwnerId = async (owner: string) => {
   const shop = await Shop.findById(owner);
+  return shop;
+};
+
+export const adminGetRequestsService = async (
+  owner: string | null, // used to filter
+  isDeleted: boolean | null, // used to filter
+  approvalStatus: ShopApprovalStatus[] | null, // used to filter
+) => {
+  const query: any = {};
+
+  if(isDeleted!=null){
+    query.isDeleted = isDeleted;
+  }
+  if(owner!=null){
+    query.owner = owner;
+  }
+  if(isDeleted!=null){
+    query.approvalStatus = {$in: approvalStatus};
+  }
+
+  const shop = await Shop.find({
+    owner,
+    isDeleted,
+    approvalStatus,
+  }).populate('owner');
+
   return shop;
 };

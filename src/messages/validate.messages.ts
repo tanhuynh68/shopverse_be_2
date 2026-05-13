@@ -13,4 +13,7 @@ export const VALIDATE_MESSAGES = {
   ADDRESS_REQUIRED: "Address is required",
   ADDRESS_MIN: "Address must be at least 5 characters",
   ADDRESS_MAX: "Address must be at most 255 characters",
+    // reject reason when admin reject req become shop of user
+  REASON_REJECT_MIN: "Reject reason must be at least 10 characters",
+  REASON_REJECT_MAX: "Reject reason must be at most 200 characters",
 };

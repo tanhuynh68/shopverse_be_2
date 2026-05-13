@@ -4,4 +4,6 @@ export const ROLE = {
   SHOP: "SHOP",
 };
 
+export type IRole =
+  (typeof ROLE)[keyof typeof ROLE];
 

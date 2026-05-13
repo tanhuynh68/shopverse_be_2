@@ -11,3 +11,8 @@ export const addRoleShop = async(_id: string)=>{
     const user = User.findByIdAndUpdate(_id, {role: [ROLE.CUSTOMER, ROLE.SHOP]}, {new: true});
     return user;
 }
+
+export const getUserByEmailService = async(email: string)=>{
+    const user = User.findOne({email});
+    return user;
+}
