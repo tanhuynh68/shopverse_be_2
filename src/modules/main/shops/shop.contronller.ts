@@ -18,9 +18,10 @@ import {
   addRoleShop,
   getUserByIdService,
 } from "../../sub/users/users.service.js";
+import { ROLE } from "../../../constants/role.constant.js";
 
 /**
- * customer send request create shop to admin
+ * customer send request create shop to admin (customer send req first time or resend when current req has been rejetced)
  * @param req
  * @param res
  * @returns
@@ -29,6 +30,25 @@ export const userRequestBecomeShop = async (req: Request, res: Response) => {
   try {
     const { userId } = req.user!;
     const { shopName, hotline, address } = req.body;
+    const shop = await getShopByOwnerId(userId);
+    // check user has been had pending req or not
+    if (shop && shop.approvalStatus === SHOP_APPROVAL_STATUS.PENDING) {
+      return returnResponse(
+        MESSAGES.SHOP_REQUEST_ALREADY_PENDING,
+        { shopStatus: shop.approvalStatus },
+        res,
+        400,
+      );
+    }
+    // check user has been had approved req or not (approved === user already has a shop)
+    if (shop && shop.approvalStatus === SHOP_APPROVAL_STATUS.APPROVED) {
+      return returnResponse(
+        MESSAGES.ALREADY_HAVE_SHOP,
+        { shopStatus: shop.approvalStatus },
+        res,
+        400,
+      );
+    }
     // normalize shop name
     const normalizedName = normalizeShopName(shopName);
     // find shop name after normalize

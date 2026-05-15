@@ -43,7 +43,7 @@ export const updateStatusService = async (
 };
 
 export const getShopByOwnerId = async (owner: string) => {
-  const shop = await Shop.findById(owner);
+  const shop = await Shop.findOne({owner});
   return shop;
 };
 

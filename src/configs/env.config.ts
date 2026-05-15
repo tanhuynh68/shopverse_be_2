@@ -9,6 +9,9 @@ const ENV = {
   CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+  // cors
+  FE_DEV_LINK: process.env.FE_DEV_LINK,
+  FE_PRODUCTION_LINK: process.env.FE_PRODUCTION_LINK
 };
 
 export default ENV;

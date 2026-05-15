@@ -5,6 +5,8 @@ import { IRole, ROLE } from "../../constants/role.constant.js";
 import User from "../../modules/sub/users/users.schema.js";
 import { returnResponse } from "../../utils/return.util.js";
 import { MESSAGES } from "../../messages/index.js";
+import { getShopByOwnerId } from "../../modules/main/shops/shop.service.js";
+import { SHOP_APPROVAL_STATUS } from "../../constants/shop.constant.js";
 //
 interface DecodedToken extends JwtPayload {
   data: {
@@ -13,9 +15,9 @@ interface DecodedToken extends JwtPayload {
     name: string;
     account_id: string;
     isPasswordExisted: boolean;
-    isActive: boolean,
-    isDeleted: boolean,
-    phone: string
+    isActive: boolean;
+    isDeleted: boolean;
+    phone: string;
   };
 }
 //
@@ -53,15 +55,21 @@ const isUser = async (
 
   try {
     const decoded = jwt.verify(token, ENV.SECRET) as DecodedToken;
-    console.log(decoded)
+    console.log(decoded);
     if (decoded.data.role.includes(ROLE.CUSTOMER)) {
       const user = await getAllUserData(decoded.data.account_id);
       // user is not exist or user has been sort deleted by admin
-      if (!user || user.isDeleted) { // isDeleted = true => user has been deleted => not found
+      if (!user || user.isDeleted) {
+        // isDeleted = true => user has been deleted => not found
         return returnResponse("User not found", null, res, 404);
       }
       if (user.isActive === false) {
-        return returnResponse("Account has not been activated yet!", null, res, 400);
+        return returnResponse(
+          "Account has not been activated yet!",
+          null,
+          res,
+          400,
+        );
       }
       //
       req.user = { ...decoded.data, userId: decoded.data.account_id };
@@ -97,6 +105,48 @@ const isAdmin = (
   }
 };
 
+const isShop = async (req: any, res: Response, next: NextFunction) => {
+  const token = getTokenFromHeader(req);
+  if (!token) {
+    return returnResponse("Access token is missing", null, res, 401);
+  }
+  try {
+    const decoded = jwt.verify(token, ENV.SECRET) as DecodedToken;
+    const userId = decoded.data.account_id;
+    // check user has been had shop role or not
+    if (!decoded.data.role.includes(ROLE.SHOP)) {
+      return returnResponse(
+        MESSAGES.YOU_ARE_NOT_SHOP,
+        { role: decoded.data.role },
+        res,
+        403,
+      );
+    }
+    //check shop is exist or not
+    const shop = await getShopByOwnerId(userId);
+    if (!shop) {
+      return returnResponse(MESSAGES.SHOP_NOT_FOUND, null, res, 404);
+    }
+    // deleted = true => not found
+    if (shop.isDeleted) {
+      return returnResponse(MESSAGES.SHOP_NOT_FOUND, null, res, 404);
+    }
+    // check shop status has been approved by admin or not
+    if (shop.approvalStatus != SHOP_APPROVAL_STATUS.APPROVED) {
+      return returnResponse(
+        MESSAGES.SHOP_HAS_NOT_BEEN_APPROVED,
+        { shopStatus: shop.approvalStatus },
+        res,
+        400,
+      );
+    }
+    req.user = { ...decoded.data, userId: userId };
+    return next();
+  } catch (error) {
+    return returnResponse("Invalid or expired token", error, res, 403);
+  }
+};
+
 const isLogin = async (req: any, res: Response, next: NextFunction) => {
   const token = getTokenFromHeader(req);
   if (!token) {
@@ -125,9 +175,8 @@ const getAllUserData = async (_id: string) => {
   return data;
 };
 
-
 const createToken = (data: any, res: Response) => {
-  if(data.isDeleted){
+  if (data.isDeleted) {
     return returnResponse(MESSAGES.USER_HAS_BEEN_DELETED, null, res, 401);
   }
   const token = jwt.sign(
@@ -146,9 +195,9 @@ const createToken = (data: any, res: Response) => {
     ENV.SECRET as string,
     {
       expiresIn: ENV.TOKEN_EXPIRED as jwt.SignOptions["expiresIn"],
-    }
+    },
   );
 
   return token;
 };
-export { isUser, isAdmin, isLogin, createToken };
+export { isUser, isAdmin, isLogin, isShop, createToken };

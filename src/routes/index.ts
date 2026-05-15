@@ -5,6 +5,7 @@ import wishlistRoute from "../modules/main/wish-lists/wish-list.route.js";
 import testRoute from "../modules/sub/tests/test.route.js";
 import shopRoute from "../modules/main/shops/shop.route.js";
 import authRoute from "../modules/main/auth/auth.route.js";
+import auditLogRoute from "../modules/main/audit-logs/audit-log.route.js";
 
 const router = express.Router();
 
@@ -13,6 +14,7 @@ router.use("/messages", messageRoute);
 router.use("/wishlist", wishlistRoute);
 router.use("/shops", shopRoute);
 router.use("/auth", authRoute);
+router.use("/audit-logs", auditLogRoute);
 // route for test
 router.use("/test", testRoute);
 

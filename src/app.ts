@@ -5,6 +5,7 @@ import { Server } from "socket.io";
 import connectDB from "./configs/db.config.js";
 import env from "./configs/env.config.js";
 import router from "./routes/index.js";
+import ENV from "./configs/env.config.js";
 
 // CONNECT DB
 connectDB();
@@ -16,7 +17,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: [ENV.FE_DEV_LINK as string, ENV.FE_PRODUCTION_LINK as string],
     methods: ["GET", "POST"],
   },
 });

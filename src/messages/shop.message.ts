@@ -14,7 +14,11 @@ export const SHOP_MESSAGES = {
   UPDATE_STATUS_APPROVED_FAILED: "Upodate status approved shop failed",
   UPDATE_STATUS_REJECTED_FAILED: "Upodate status rejected shop failed",
   ADD_ROLE_SHOP_FAILED: "Add role shop failed",
-  SHOP_APPROVAL_STATUS_IS_NOT_EXIST: "Shop approval status!",
+  SHOP_APPROVAL_STATUS_IS_NOT_EXIST: "Shop approval status is not exist!",
   ADMIN_GET_REQUEST_USER_BECOME_SHOP_FAILED: 'admin get request user become shop faield',
   ADMIN_GET_REQUEST_USER_BECOME_SHOP_SUCCESSFULLY: 'Admin get request user become shop successfully!',
+  SHOP_HAS_BEEN_DELETED: "Shop has been deleted!",
+  SHOP_HAS_NOT_BEEN_APPROVED: "Shop has not been approved!",
+  SHOP_REQUEST_ALREADY_PENDING: "Your shop request is already pending approval.",
+  ALREADY_HAVE_SHOP: "You already have a shop."
 };

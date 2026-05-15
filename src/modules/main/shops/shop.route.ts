@@ -39,7 +39,7 @@ shopRoute.post(
 // admin get requests of users want to become shop
 shopRoute.get(
   "/request",
-  isUser,
+  isAdmin,
   validateBody(adminGetRequestsValidate),
   adminGetRequests,
 );

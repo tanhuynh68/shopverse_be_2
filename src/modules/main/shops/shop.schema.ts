@@ -33,10 +33,10 @@ const shopSchema = new Schema(
       required: true,
       unique: true,
     },
-    isActive: {
-      type: Boolean,
-      default: false,
-    },
+    // isActive: {
+    //   type: Boolean,
+    //   default: false,
+    // },
     followers: {
       type: Number,
       default: 0,
