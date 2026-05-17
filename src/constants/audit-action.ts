@@ -1,10 +1,16 @@
-
 export enum AuditAction {
+  // auth
   LOGIN_SUCCESS = "LOGIN_SUCCESS",
   LOGIN_FAILED = "LOGIN_FAILED",
 
+  // shop request
+  SEND_CREATE_SHOP_REQUEST = "SEND_CREATE_SHOP_REQUEST",
+  RESEND_CREATE_SHOP_REQUEST = "RESEND_CREATE_SHOP_REQUEST",
+
+  // shop moderation
   APPROVE_SHOP = "APPROVE_SHOP",
   REJECT_SHOP = "REJECT_SHOP",
 
+  // user moderation
   BAN_USER = "BAN_USER",
 }

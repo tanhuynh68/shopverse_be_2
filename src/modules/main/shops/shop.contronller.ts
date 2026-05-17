@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { normalizeShopName } from "../../../utils/format.ultil.js";
+import { normalizeShopName } from "../../../utils/format.util.js";
 import {
   adminGetRequestsService,
   getShopByHotline,
@@ -19,34 +19,54 @@ import {
   getUserByIdService,
 } from "../../sub/users/users.service.js";
 import { ROLE } from "../../../constants/role.constant.js";
+import { createAuditLog } from "../audit-logs/audit-log.controller.js";
+import { AuditAction } from "../../../constants/audit-action.js";
+import { AuditTargetType } from "../../../constants/audit-target-type.js";
 
 /**
- * customer send request create shop to admin (customer send req first time or resend when current req has been rejetced)
+ * customer send request create shop to admin (customer send req first time or resend when current req has been rejected)
  * @param req
  * @param res
  * @returns
  */
-export const userRequestBecomeShop = async (req: Request, res: Response) => {
+export const customerRequestBecomeShop = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     const { userId } = req.user!;
     const { shopName, hotline, address } = req.body;
     const shop = await getShopByOwnerId(userId);
-    // check user has been had pending req or not
-    if (shop && shop.approvalStatus === SHOP_APPROVAL_STATUS.PENDING) {
-      return returnResponse(
-        MESSAGES.SHOP_REQUEST_ALREADY_PENDING,
-        { shopStatus: shop.approvalStatus },
-        res,
-        400,
+    // check if user sent request
+    if (shop) {
+      // check user has been had pending req or not
+      if (shop.approvalStatus === SHOP_APPROVAL_STATUS.PENDING) {
+        return returnResponse(
+          MESSAGES.SHOP_REQUEST_ALREADY_PENDING,
+          { shopStatus: shop.approvalStatus },
+          res,
+          400,
+        );
+      }
+      // check user has been had approved req or not (approved === user already has a shop)
+      if (shop.approvalStatus === SHOP_APPROVAL_STATUS.APPROVED) {
+        return returnResponse(
+          MESSAGES.ALREADY_HAVE_SHOP,
+          { shopStatus: shop.approvalStatus },
+          res,
+          400,
+        );
+      }
+      // if request of shop is rejected => update status shop from rejected => pending (resend)
+      const updateStatusShop = await updateStatusService(
+        userId,
+        SHOP_APPROVAL_STATUS.PENDING,
       );
-    }
-    // check user has been had approved req or not (approved === user already has a shop)
-    if (shop && shop.approvalStatus === SHOP_APPROVAL_STATUS.APPROVED) {
       return returnResponse(
-        MESSAGES.ALREADY_HAVE_SHOP,
-        { shopStatus: shop.approvalStatus },
+        MESSAGES.RESEND_REQUEST_CREATE_SHOP_SUCCESSFULLY,
+        updateStatusShop,
         res,
-        400,
+        200,
       );
     }
     // normalize shop name
@@ -62,10 +82,11 @@ export const userRequestBecomeShop = async (req: Request, res: Response) => {
         409,
       );
     }
+    // check hotline
     const isHotlineExisted = await getShopByHotline(hotline);
     if (isHotlineExisted) {
       return returnResponse(
-        MESSAGES.SHOP_HOLINE_EXISTED,
+        MESSAGES.SHOP_HOTLINE_EXISTED,
         isHotlineExisted,
         res,
         409,
@@ -79,13 +100,39 @@ export const userRequestBecomeShop = async (req: Request, res: Response) => {
       normalizedName,
       userId,
     );
+    // create audit log
+    const auditLog = await createAuditLog(
+      req,
+      res,
+      AuditAction.SEND_CREATE_SHOP_REQUEST,
+      userId,
+      AuditTargetType.SHOP,
+      "",
+      true,
+      userId,
+    );
+    // return data
+    const data = { request: sendRequest, auditLog: auditLog };
     return returnResponse(
       MESSAGES.REQUEST_CREATE_SHOP_SUCCESSFULLY,
-      sendRequest,
+      data,
       res,
       201,
     );
   } catch (error) {
+    const { userId } = req.user!;
+    // create audit log
+    const auditLog = await createAuditLog(
+      req,
+      res,
+      AuditAction.SEND_CREATE_SHOP_REQUEST,
+      userId,
+      AuditTargetType.SHOP,
+      "",
+      false,
+      userId,
+    );
+    console.log("audit log:", auditLog);
     return returnResponse(MESSAGES.REQUEST_CREATE_SHOP_FAILED, error, res, 500);
   }
 };
@@ -99,6 +146,8 @@ export const userRequestBecomeShop = async (req: Request, res: Response) => {
 export const adminApproveRequest = async (req: Request, res: Response) => {
   try {
     const { owner } = req.body;
+    const { userId } = req.user!;
+
     const isUserExisted = await getUserByIdService(owner);
     // check user existed or not
     if (!isUserExisted) {
@@ -141,10 +190,22 @@ export const adminApproveRequest = async (req: Request, res: Response) => {
     if (!addRole) {
       return returnResponse(MESSAGES.ADD_ROLE_SHOP_FAILED, null, res, 500);
     }
+    // create audit log
+    const auditLog = await createAuditLog(
+      req,
+      res,
+      AuditAction.APPROVE_SHOP,
+      owner,
+      AuditTargetType.SHOP,
+      "",
+      true,
+      userId,
+    );
     //
     const data = {
       shopAfterUpdate: updateStatus?.approvalStatus,
       userAfterUpdate: addRole?.role,
+      auditLog,
     };
     return returnResponse(
       MESSAGES.APPROVE_CREATE_SHOP_SUCCESSFULLY,
@@ -153,6 +214,19 @@ export const adminApproveRequest = async (req: Request, res: Response) => {
       200,
     );
   } catch (error) {
+    const { userId } = req.user!;
+    const { owner } = req.body;
+    const auditLog = await createAuditLog(
+      req,
+      res,
+      AuditAction.APPROVE_SHOP,
+      owner,
+      AuditTargetType.SHOP,
+      "",
+      false,
+      userId,
+    );
+    console.log("audit log: ", auditLog);
     return returnResponse(MESSAGES.APPROVE_CREATE_SHOP_FAILED, error, res, 500);
   }
 };
@@ -166,6 +240,8 @@ export const adminApproveRequest = async (req: Request, res: Response) => {
 export const adminRejectRequest = async (req: Request, res: Response) => {
   try {
     const { owner, rejectReason } = req.body;
+    const { userId } = req.user!;
+
     const isUserExisted = await getUserByIdService(owner);
     // check user existed or not
     if (!isUserExisted) {
@@ -212,11 +288,23 @@ export const adminRejectRequest = async (req: Request, res: Response) => {
     if (!addRole) {
       return returnResponse(MESSAGES.ADD_ROLE_SHOP_FAILED, null, res, 500);
     }
+    const auditLog = await createAuditLog(
+      req,
+      res,
+      AuditAction.APPROVE_SHOP,
+      owner,
+      AuditTargetType.SHOP,
+      "",
+      true,
+      userId,
+    );
     //
     const data = {
       shopAfterUpdate: updateStatus?.approvalStatus,
       userAfterUpdate: addRole?.role,
+      auditLog,
     };
+
     return returnResponse(
       MESSAGES.APPROVE_CREATE_SHOP_SUCCESSFULLY,
       data,
@@ -224,6 +312,20 @@ export const adminRejectRequest = async (req: Request, res: Response) => {
       200,
     );
   } catch (error) {
+    const { userId } = req.user!;
+    const { owner } = req.body;
+    // create audit log
+    const auditLog = await createAuditLog(
+      req,
+      res,
+      AuditAction.APPROVE_SHOP,
+      owner,
+      AuditTargetType.SHOP,
+      "",
+      false,
+      userId,
+    );
+    console.log("audit log:", auditLog);
     return returnResponse(MESSAGES.APPROVE_CREATE_SHOP_FAILED, error, res, 500);
   }
 };
@@ -263,6 +365,7 @@ export const adminGetRequests = async (req: Request, res: Response) => {
       isDeleted,
       approvalStatus,
     );
+
     return returnResponse(
       MESSAGES.ADMIN_GET_REQUEST_USER_BECOME_SHOP_SUCCESSFULLY,
       requests,

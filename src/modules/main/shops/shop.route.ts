@@ -5,7 +5,7 @@ import { validateBody } from "../../../utils/validate.util.js";
 import {
   adminApproveRequest,
   adminGetRequests,
-  userRequestBecomeShop,
+  customerRequestBecomeShop,
 } from "./shop.contronller.js";
 import {
   userRequestBecomeShopValidate,
@@ -20,11 +20,11 @@ shopRoute.post(
   "/request",
   isUser,
   validateBody(userRequestBecomeShopValidate),
-  userRequestBecomeShop,
+  customerRequestBecomeShop,
 );
 // admin approve req become shop of user
 shopRoute.post(
-  "/aprrove",
+  "/approve",
   isAdmin,
   validateBody(adminApproveRequestValidate),
   adminApproveRequest,

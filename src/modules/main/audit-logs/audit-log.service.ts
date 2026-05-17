@@ -29,7 +29,7 @@ export const createAuditLogService = async (
   return auditLog;
 };
 
-export const getAuditLogs = async (
+export const getAuditLogsService = async (
   auditLogId: string,
   actions: AuditAction[],
   actors: string[],
@@ -50,4 +50,9 @@ export const getAuditLogs = async (
   }
   const auditLogs = await AuditLog.find(query);
   return auditLogs;
+};
+
+export const getAuditLogById = async (id: string) => {
+  const auditLog = await AuditLog.findById(id);
+  return auditLog;
 };
