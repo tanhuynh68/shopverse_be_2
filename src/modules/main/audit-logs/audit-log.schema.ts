@@ -47,7 +47,6 @@ const auditLogSchema = new Schema<IAuditLog>(
 
     description: {
       type: String,
-      required: true,
       trim: true,
     },
 

@@ -57,17 +57,15 @@ export const customerRequestBecomeShop = async (
           400,
         );
       }
-      // if request of shop is rejected => update status shop from rejected => pending (resend)
-      const updateStatusShop = await updateStatusService(
-        userId,
-        SHOP_APPROVAL_STATUS.PENDING,
-      );
-      return returnResponse(
-        MESSAGES.RESEND_REQUEST_CREATE_SHOP_SUCCESSFULLY,
-        updateStatusShop,
-        res,
-        200,
-      );
+      // customer's request has been rejected by admin
+      if (shop.approvalStatus === SHOP_APPROVAL_STATUS.REJECTED) {
+        return returnResponse(
+          MESSAGES.SHOP_HAS_BEEN_REJECTED_PLEASE_CREATE_NEW_REQUEST,
+          { shopStatus: shop.approvalStatus },
+          res,
+          400,
+        );
+      }
     }
     // normalize shop name
     const normalizedName = normalizeShopName(shopName);
@@ -159,12 +157,12 @@ export const adminApproveRequest = async (req: Request, res: Response) => {
     if (!isUserExisted.isActive) {
       return returnResponse(MESSAGES.USER_INACTIVE, null, res, 400);
     }
-    const isShopExisted = await getShopByOwnerId(owner);
-    if (!isShopExisted) {
+    const shop = await getShopByOwnerId(owner);
+    if (!shop) {
       return returnResponse(MESSAGES.SHOP_NOT_FOUND, null, res, 404);
     }
     // shop status must be pending to admin reject
-    if (isShopExisted.approvalStatus != SHOP_APPROVAL_STATUS.PENDING) {
+    if (shop.approvalStatus != SHOP_APPROVAL_STATUS.PENDING) {
       return returnResponse(
         MESSAGES.SHOP_APPROVAL_STATUS_MUST_BE_PENDING,
         null,
@@ -174,7 +172,7 @@ export const adminApproveRequest = async (req: Request, res: Response) => {
     }
     // update status to approved
     const updateStatus = await updateStatusService(
-      owner,
+      shop._id.toString(),
       SHOP_APPROVAL_STATUS.APPROVED,
     );
     if (!updateStatus) {
@@ -256,12 +254,12 @@ export const adminRejectRequest = async (req: Request, res: Response) => {
       return returnResponse(MESSAGES.USER_INACTIVE, null, res, 400);
     }
     // check shop existed or not
-    const isShopExisted = await getShopByOwnerId(owner);
-    if (!isShopExisted) {
+    const shop = await getShopByOwnerId(owner);
+    if (!shop) {
       return returnResponse(MESSAGES.SHOP_NOT_FOUND, null, res, 404);
     }
     // shop status must be pending to admin reject
-    if (isShopExisted.approvalStatus != SHOP_APPROVAL_STATUS.PENDING) {
+    if (shop.approvalStatus != SHOP_APPROVAL_STATUS.PENDING) {
       return returnResponse(
         MESSAGES.SHOP_APPROVAL_STATUS_MUST_BE_PENDING,
         null,
@@ -271,10 +269,11 @@ export const adminRejectRequest = async (req: Request, res: Response) => {
     }
     // update status to rejected
     const updateStatus = await updateStatusService(
-      owner,
+      shop._id.toString(),
       SHOP_APPROVAL_STATUS.REJECTED,
       rejectReason,
     );
+    console.log(updateStatus);
     if (!updateStatus) {
       return returnResponse(
         MESSAGES.UPDATE_STATUS_REJECTED_FAILED,
@@ -288,10 +287,11 @@ export const adminRejectRequest = async (req: Request, res: Response) => {
     if (!addRole) {
       return returnResponse(MESSAGES.ADD_ROLE_SHOP_FAILED, null, res, 500);
     }
+    //
     const auditLog = await createAuditLog(
       req,
       res,
-      AuditAction.APPROVE_SHOP,
+      AuditAction.REJECT_SHOP,
       owner,
       AuditTargetType.SHOP,
       "",
@@ -306,7 +306,7 @@ export const adminRejectRequest = async (req: Request, res: Response) => {
     };
 
     return returnResponse(
-      MESSAGES.APPROVE_CREATE_SHOP_SUCCESSFULLY,
+      MESSAGES.REJECT_CUSTOMER_REQUEST_CREATE_SHOP_SUCCESSFULLY,
       data,
       res,
       200,
@@ -318,7 +318,7 @@ export const adminRejectRequest = async (req: Request, res: Response) => {
     const auditLog = await createAuditLog(
       req,
       res,
-      AuditAction.APPROVE_SHOP,
+      AuditAction.REJECT_SHOP,
       owner,
       AuditTargetType.SHOP,
       "",
@@ -326,7 +326,12 @@ export const adminRejectRequest = async (req: Request, res: Response) => {
       userId,
     );
     console.log("audit log:", auditLog);
-    return returnResponse(MESSAGES.APPROVE_CREATE_SHOP_FAILED, error, res, 500);
+    return returnResponse(
+      MESSAGES.REJECT_CUSTOMER_REQUEST_CREATE_SHOP_FAILED,
+      error,
+      res,
+      500,
+    );
   }
 };
 
@@ -340,7 +345,9 @@ export const adminGetRequests = async (req: Request, res: Response) => {
   try {
     const { owner, approvalStatus, isDeleted } = req.body;
     // check owner (shop id) is existed or not ?
-    if (!owner || owner === null) {
+    if (owner != '') {
+      const shop = await getShopByOwnerId(owner)
+      if(!shop)
       return returnResponse(MESSAGES.SHOP_NOT_FOUND, null, res, 404);
     }
     // check shop approval status is exist or not
@@ -375,6 +382,51 @@ export const adminGetRequests = async (req: Request, res: Response) => {
   } catch (error) {
     return returnResponse(
       MESSAGES.ADMIN_GET_REQUEST_USER_BECOME_SHOP_FAILED,
+      error,
+      res,
+      500,
+    );
+  }
+};
+
+/**
+ * customer resend new request after admin has been rejected
+ * @param req
+ * @param res
+ * @returns
+ */
+export const resendRequestCreateShop = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.user!;
+    const shop = await getShopByOwnerId(userId);
+    // check customer has been send a request to create shop and this req has been rejected by admin before customer resend
+    if (!shop) {
+      return returnResponse(MESSAGES.SHOP_NOT_FOUND, null, res, 404);
+    }
+    // check status of shop must be rejected
+    if (shop && shop.approvalStatus != SHOP_APPROVAL_STATUS.REJECTED) {
+      return returnResponse(
+        MESSAGES.ONLY_STATUS_SHOP_REJECTED_CAN_RESEND,
+        null,
+        res,
+        400,
+      );
+    }
+    // update status rejected => pending
+    const updateStatus = await updateStatusService(
+      shop._id.toString(),
+      SHOP_APPROVAL_STATUS.PENDING,
+      "",
+    );
+    return returnResponse(
+      MESSAGES.RESEND_REQUEST_CREATE_SHOP_SUCCESSFULLY,
+      updateStatus,
+      res,
+      200,
+    );
+  } catch (error) {
+    return returnResponse(
+      MESSAGES.RESEND_REQUEST_CREATE_SHOP_FAILED,
       error,
       res,
       500,

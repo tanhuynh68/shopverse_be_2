@@ -30,12 +30,12 @@ export const sendRequestService = async (
 };
 
 export const updateStatusService = async (
-  owner: string,
+  shopId: string,
   approvalStatus: ShopApprovalStatus,
   rejectReason?: string,
 ) => {
   const shop = await Shop.findByIdAndUpdate(
-    owner,
+    shopId,
     { approvalStatus, rejectReason },
     { new: true },
   );
@@ -43,32 +43,27 @@ export const updateStatusService = async (
 };
 
 export const getShopByOwnerId = async (owner: string) => {
-  const shop = await Shop.findOne({owner});
+  const shop = await Shop.findOne({ owner });
   return shop;
 };
 
 export const adminGetRequestsService = async (
-  owner: string | null, // used to filter
+  owner: string, // used to filter
   isDeleted: boolean | null, // used to filter
-  approvalStatus: ShopApprovalStatus[] | null, // used to filter
+  approvalStatus: ShopApprovalStatus[], // used to filter
 ) => {
   const query: any = {};
 
-  if(isDeleted!=null){
+  if (isDeleted != null) {
     query.isDeleted = isDeleted;
   }
-  if(owner!=null){
+  if (owner != "") {
     query.owner = owner;
   }
-  if(isDeleted!=null){
-    query.approvalStatus = {$in: approvalStatus};
+  if (approvalStatus.length > 0) {
+    query.approvalStatus = { $in: approvalStatus };
   }
-
-  const shop = await Shop.find({
-    owner,
-    isDeleted,
-    approvalStatus,
-  }).populate('owner');
-
+  console.log(query);
+  const shop = await Shop.find(query).populate("owner", "_id name email role phone avatar");
   return shop;
 };

@@ -22,4 +22,8 @@ export const SHOP_MESSAGES = {
   SHOP_REQUEST_ALREADY_PENDING: "Your shop request is already pending approval.",
   ALREADY_HAVE_SHOP: "You already have a shop.",
   RESEND_REQUEST_CREATE_SHOP_SUCCESSFULLY: 'Resend request create shop successfully!',
+  REJECT_CUSTOMER_REQUEST_CREATE_SHOP_FAILED: "Reject customer request create shop failed",
+  REJECT_CUSTOMER_REQUEST_CREATE_SHOP_SUCCESSFULLY: "Reject customer request create shop successfully!",
+  ONLY_STATUS_SHOP_REJECTED_CAN_RESEND: 'Only status shop rejected can resend!',
+  RESEND_REQUEST_CREATE_SHOP_FAILED:'Resend request create shop failed',
 };

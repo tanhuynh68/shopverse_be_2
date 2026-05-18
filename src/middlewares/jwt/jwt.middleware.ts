@@ -90,10 +90,8 @@ const isAdmin = (
   if (!token) {
     return returnResponse("Access token is missing", null, res, 401);
   }
-
   try {
     const decoded = jwt.verify(token, ENV.SECRET) as DecodedToken;
-    console.log("decoded: ", decoded);
     if (decoded.data.role.includes(ROLE.ADMIN)) {
       //
       req.user = { ...decoded.data, userId: decoded.data.account_id };

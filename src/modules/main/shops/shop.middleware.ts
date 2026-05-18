@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MESSAGES } from "../../../messages/index.js";
+import { SHOP_APPROVAL_STATUS } from "../../../constants/shop.constant.js";
 
 export const userRequestBecomeShopValidate = z.object({
   shopName: z

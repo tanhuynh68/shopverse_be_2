@@ -5,8 +5,10 @@ import { validateBody } from "../../../utils/validate.util.js";
 import {
   adminApproveRequest,
   adminGetRequests,
+  adminRejectRequest,
   customerRequestBecomeShop,
-} from "./shop.contronller.js";
+  resendRequestCreateShop,
+} from "./shop.controller.js";
 import {
   userRequestBecomeShopValidate,
   adminApproveRequestValidate,
@@ -34,14 +36,20 @@ shopRoute.post(
   "/reject",
   isAdmin,
   validateBody(adminRejectRequestValidate),
-  adminApproveRequest,
+  adminRejectRequest,
 );
+
 // admin get requests of users want to become shop
-shopRoute.get(
-  "/request",
+shopRoute.post(
+  "/get-requests",
   isAdmin,
   validateBody(adminGetRequestsValidate),
   adminGetRequests,
 );
-
+// customer resend new request after admin has been rejected\
+shopRoute.post(
+  "/resend-request",
+  isUser,
+  resendRequestCreateShop,
+);
 export default shopRoute;

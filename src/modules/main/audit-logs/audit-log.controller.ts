@@ -64,12 +64,7 @@ export const createAuditLog = async (
       description,
       metadata,
     );
-    return returnResponse(
-      MESSAGES.CREATE_AUDIT_LOG_SUCCESSFULLY,
-      auditLog,
-      res,
-      201,
-    );
+    return auditLog;
   } catch (error) {
     return returnResponse(MESSAGES.CREATE_AUDIT_LOG_FAILED, error, res, 500);
   }
