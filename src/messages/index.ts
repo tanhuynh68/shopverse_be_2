@@ -1,3 +1,4 @@
+import { ADDRESS_MESSAGES } from "./address.message.js";
 import { AUDIT_LOG_MESSAGES } from "./audit-log.messages.js";
 import { AUTH_MESSAGES } from "./auth.message.js";
 import { ROOM_MESSAGES } from "./room.message.js";
@@ -12,6 +13,7 @@ export const MESSAGES = {
   ...VALIDATE_MESSAGES,
   ...AUTH_MESSAGES,
   ...AUDIT_LOG_MESSAGES,
+  ...ADDRESS_MESSAGES,
   // message
   CREATE_TEXT_MESSAGE_SUCCESSFULLY: "Create text message successfully!",
   CREATE_TEXT_MESSAGE_FAILED: "Create text message failed!",
